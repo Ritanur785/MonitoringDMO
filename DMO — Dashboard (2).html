@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DMO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAFAF9; --surface:#FFFFFF; --border:#E4E4E7;
+  --ink:#18181B; --muted:#71717A; --muted2:#A1A1AA;
+  --accent:#1E3A5F; --accent-soft:#EAF0F6;
+  --blue:#2563EB; --blue-soft:#EFF4FE;
+  --green:#15803D; --green-soft:#EEF7F0;
+  --amber:#B45309; --amber-soft:#FCF3E7;
+  --red:#B91C1C; --red-soft:#FBEEEE;
+  --radius:10px; --radius-sm:6px;
+  --shadow:0 1px 2px rgba(24,24,27,.04), 0 1px 8px rgba(24,24,27,.03);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111113; --surface:#18181B; --border:#2A2A2E;
+    --ink:#F4F4F5; --muted:#A1A1AA; --muted2:#71717A;
+    --accent:#7FA6D1; --accent-soft:#1C2B3B;
+    --blue:#5B9BF5; --blue-soft:#152238;
+    --green:#4ADE80; --green-soft:#132419;
+    --amber:#F5B657; --amber-soft:#2A2114;
+    --red:#F1706A; --red-soft:#2B1616;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111113; --surface:#18181B; --border:#2A2A2E;
+  --ink:#F4F4F5; --muted:#A1A1AA; --muted2:#71717A;
+  --accent:#7FA6D1; --accent-soft:#1C2B3B;
+  --blue:#5B9BF5; --blue-soft:#152238;
+  --green:#4ADE80; --green-soft:#132419;
+  --amber:#F5B657; --amber-soft:#2A2114;
+  --red:#F1706A; --red-soft:#2B1616;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg); color:var(--ink);
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  -webkit-font-smoothing:antialiased;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+.mono{font-family:'JetBrains Mono',monospace;}
+
+/* ---- layout ---- */
+.app{display:flex; min-height:100vh;}
+
+.sidebar{
+  width:230px; flex-shrink:0; background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:20px 14px; position:sticky; top:0; height:100vh;
+  display:flex; flex-direction:column; gap:24px;
+}
+.brand{display:flex; align-items:center; gap:10px; padding:4px 8px;}
+.brand-mark{
+  width:30px;height:30px;border-radius:8px;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff; font-weight:700; font-size:13px; flex-shrink:0;
+}
+.brand-text{line-height:1.2;}
+.brand-text b{font-size:14.5px; font-weight:600;}
+.brand-text span{font-size:11.5px; color:var(--muted); display:block;}
+
+.nav{display:flex; flex-direction:column; gap:2px;}
+.nav a{
+  display:flex; align-items:center; gap:10px;
+  padding:9px 10px; border-radius:var(--radius-sm);
+  font-size:13.5px; color:var(--muted); font-weight:500;
+  transition:background .15s, color .15s;
+}
+.nav a svg{width:17px;height:17px; flex-shrink:0;}
+.nav a:hover{background:var(--bg); color:var(--ink);}
+.nav a.active{background:var(--accent-soft); color:var(--accent);}
+.nav-group-label{font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted2); padding:6px 10px 2px;}
+
+.sidebar-foot{margin-top:auto; padding-top:12px; border-top:1px solid var(--border);}
+.user-chip{display:flex; align-items:center; gap:9px; padding:6px 8px; border-radius:var(--radius-sm);}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--bg); border:1px solid var(--border); display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;color:var(--muted);}
+.user-chip .u-meta{line-height:1.2;}
+.user-chip .u-meta b{font-size:12.5px; font-weight:600; display:block;}
+.user-chip .u-meta span{font-size:11px; color:var(--muted);}
+
+.main{flex:1; min-width:0; display:flex; flex-direction:column;}
+
+.topbar{
+  position:sticky; top:0; z-index:20; background:var(--bg);
+  border-bottom:1px solid var(--border);
+  padding:14px 28px; display:flex; align-items:center; gap:14px;
+  padding-top:calc(14px + env(safe-area-inset-top,0px));
+}
+.hamburger{display:none; background:none; border:1px solid var(--border); border-radius:var(--radius-sm); width:34px;height:34px; align-items:center; justify-content:center; color:var(--ink);}
+.search-wrap{
+  flex:1; max-width:380px; display:flex; align-items:center; gap:8px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius-sm); padding:8px 12px;
+}
+.search-wrap svg{width:15px;height:15px; color:var(--muted2); flex-shrink:0;}
+.search-wrap input{border:none; outline:none; background:none; font-size:13.5px; color:var(--ink); width:100%; font-family:inherit;}
+.search-wrap input::placeholder{color:var(--muted2);}
+.topbar-right{margin-left:auto; display:flex; align-items:center; gap:10px;}
+.icon-btn{
+  width:34px;height:34px; border-radius:var(--radius-sm); border:1px solid var(--border);
+  background:var(--surface); display:flex; align-items:center; justify-content:center; color:var(--muted); position:relative;
+}
+.icon-btn svg{width:16px;height:16px;}
+.dot{position:absolute; top:6px; right:6px; width:6px;height:6px; border-radius:50%; background:var(--red);}
+
+.content{padding:24px 28px 60px; max-width:1360px; width:100%; margin:0 auto;}
+.page-head{margin-bottom:20px;}
+.page-head h1{font-size:21px; font-weight:700; letter-spacing:-.01em;}
+.page-head p{font-size:13.5px; color:var(--muted); margin-top:3px;}
+
+/* ---- stat cards ---- */
+.stats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px;}
+.stat-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px 18px; box-shadow:var(--shadow);
+}
+.stat-top{display:flex; justify-content:space-between; align-items:flex-start;}
+.stat-label{font-size:12.5px; color:var(--muted); font-weight:500;}
+.stat-icon{width:28px;height:28px;border-radius:7px; display:flex;align-items:center;justify-content:center;}
+.stat-icon svg{width:15px;height:15px;}
+.stat-value{font-size:28px; font-weight:700; margin-top:10px; letter-spacing:-.02em;}
+.stat-delta{font-size:12px; margin-top:5px; color:var(--muted); display:flex; align-items:center; gap:4px;}
+.stat-delta.up{color:var(--green);}
+.stat-delta.down{color:var(--red);}
+.stat-delta svg{width:11px;height:11px;}
+
+/* ---- grid: chart + activity ---- */
+.grid-2{display:grid; grid-template-columns:1.6fr 1fr; gap:14px; margin-bottom:22px; align-items:stretch;}
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); display:flex; flex-direction:column;}
+.panel-head{padding:16px 18px 4px; display:flex; justify-content:space-between; align-items:center;}
+.panel-head h3{font-size:14px; font-weight:600;}
+.panel-head .sub{font-size:11.5px; color:var(--muted);}
+.chart-tabs{display:flex; gap:4px; background:var(--bg); border:1px solid var(--border); border-radius:7px; padding:2px;}
+.chart-tabs button{border:none; background:none; font-size:11.5px; padding:4px 9px; border-radius:5px; color:var(--muted); font-weight:500;}
+.chart-tabs button.active{background:var(--surface); color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.06);}
+.chart-body{padding:6px 14px 16px;}
+
+.activity-list{padding:2px 8px 12px; overflow-y:auto; max-height:280px;}
+.activity-item{display:flex; gap:10px; padding:9px 10px; border-radius:var(--radius-sm);}
+.activity-item:hover{background:var(--bg);}
+.act-dot{width:7px;height:7px;border-radius:50%; margin-top:6px; flex-shrink:0;}
+.act-body p{font-size:13px; line-height:1.4;}
+.act-body p b{font-weight:600;}
+.act-body span{font-size:11.5px; color:var(--muted2);}
+
+/* ---- table ---- */
+.table-panel{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow);}
+.table-toolbar{display:flex; align-items:center; gap:10px; padding:14px 18px; flex-wrap:wrap; border-bottom:1px solid var(--border);}
+.table-toolbar h3{font-size:14px; font-weight:600; margin-right:auto;}
+.select{
+  font-size:12.5px; padding:7px 10px; border-radius:var(--radius-sm); border:1px solid var(--border);
+  background:var(--surface); color:var(--ink); font-family:inherit;
+}
+.table-scroll{overflow-x:auto;}
+table{width:100%; border-collapse:collapse; min-width:720px;}
+thead th{
+  text-align:left; font-size:11.5px; color:var(--muted); font-weight:600;
+  padding:10px 18px; border-bottom:1px solid var(--border); white-space:nowrap; cursor:pointer; user-select:none;
+}
+thead th:hover{color:var(--ink);}
+thead th .arrow{opacity:.4; margin-left:3px; font-size:10px;}
+tbody td{padding:12px 18px; font-size:13.5px; border-bottom:1px solid var(--border); vertical-align:middle;}
+tbody tr{transition:background .12s; cursor:pointer;}
+tbody tr:hover{background:var(--bg);}
+tbody tr:last-child td{border-bottom:none;}
+.item-name{font-weight:500;}
+.item-name span{display:block; font-size:11.5px; color:var(--muted); font-weight:400; margin-top:1px;}
+.badge{display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:99px; font-size:11.5px; font-weight:600;}
+.badge::before{content:""; width:6px;height:6px;border-radius:50%;}
+.badge.aktif{background:var(--blue-soft); color:var(--blue);} .badge.aktif::before{background:var(--blue);}
+.badge.selesai{background:var(--green-soft); color:var(--green);} .badge.selesai::before{background:var(--green);}
+.badge.pending{background:var(--amber-soft); color:var(--amber);} .badge.pending::before{background:var(--amber);}
+.badge.terlambat{background:var(--red-soft); color:var(--red);} .badge.terlambat::before{background:var(--red);}
+.progress-cell{display:flex; align-items:center; gap:8px; min-width:110px;}
+.progress-track{flex:1; height:5px; border-radius:99px; background:var(--border); overflow:hidden;}
+.progress-fill{height:100%; border-radius:99px; background:var(--accent);}
+.pic{display:flex; align-items:center; gap:7px;}
+.table-empty{padding:40px 18px; text-align:center; color:var(--muted); font-size:13px;}
+
+/* ---- detail panel ---- */
+.overlay{position:fixed; inset:0; background:rgba(15,15,17,.35); z-index:40; opacity:0; pointer-events:none; transition:opacity .2s;}
+.overlay.show{opacity:1; pointer-events:auto;}
+.detail-panel{
+  position:fixed; top:0; right:0; height:100vh; width:400px; max-width:92vw;
+  background:var(--surface); border-left:1px solid var(--border); z-index:41;
+  transform:translateX(100%); transition:transform .25s ease; display:flex; flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.detail-panel.show{transform:translateX(0);}
+.detail-head{padding:18px 20px 14px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start;}
+.detail-head h2{font-size:17px; font-weight:700; line-height:1.3; padding-right:10px;}
+.detail-head .close-btn{width:30px;height:30px; border-radius:7px; border:1px solid var(--border); background:none; display:flex;align-items:center;justify-content:center; flex-shrink:0; color:var(--muted);}
+.detail-body{padding:18px 20px; overflow-y:auto; flex:1;}
+.detail-row{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); font-size:13px;}
+.detail-row:last-child{border-bottom:none;}
+.detail-row .k{color:var(--muted);}
+.detail-row .v{font-weight:500; text-align:right;}
+.detail-section-title{font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted2); margin:18px 0 4px;}
+.detail-note{font-size:13px; line-height:1.6; color:var(--ink); background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; margin-top:4px;}
+
+.svg-line{fill:none; stroke:var(--accent); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+.svg-area{fill:url(#gradFill); opacity:.5;}
+.svg-dot{fill:var(--surface); stroke:var(--accent); stroke-width:2;}
+.svg-grid{stroke:var(--border); stroke-width:1;}
+.svg-axis-label{font-size:10px; fill:var(--muted2); font-family:'Inter',sans-serif;}
+
+.stat-card{cursor:pointer; transition:border-color .15s, transform .15s;}
+.stat-card:hover{border-color:var(--accent); transform:translateY(-1px);}
+.stat-card.is-active{border-color:var(--accent); background:var(--accent-soft);}
+
+.btn{
+  font-size:12.5px; font-weight:600; padding:8px 13px; border-radius:var(--radius-sm);
+  border:1px solid var(--border); background:var(--surface); color:var(--ink);
+  display:inline-flex; align-items:center; gap:6px; transition:background .12s, border-color .12s, transform .08s;
+}
+.btn:active{transform:scale(.97);}
+.btn svg{width:14px;height:14px;}
+.btn-primary{background:var(--accent); border-color:var(--accent); color:#fff;}
+.btn-primary:hover{opacity:.92;}
+.btn-danger{color:var(--red); border-color:var(--red-soft);}
+.btn-danger:hover{background:var(--red-soft);}
+.btn-ghost:hover{background:var(--bg);}
+.btn-block{width:100%; justify-content:center;}
+
+.field{margin-bottom:14px;}
+.field label{display:block; font-size:11.5px; font-weight:600; color:var(--muted); margin-bottom:5px;}
+.field input, .field select, .field textarea{
+  width:100%; font-family:inherit; font-size:13.5px; color:var(--ink);
+  border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg);
+  padding:8px 10px; outline:none; transition:border-color .12s;
+}
+.field input:focus, .field select:focus, .field textarea:focus{border-color:var(--accent);}
+.field textarea{resize:vertical; min-height:70px; line-height:1.5;}
+.field-row{display:flex; gap:10px;}
+.field-row .field{flex:1;}
+.range-row{display:flex; align-items:center; gap:10px;}
+.range-row input[type=range]{flex:1; accent-color:var(--accent);}
+.range-row .range-val{font-size:12.5px; font-weight:600; width:38px; text-align:right;}
+.detail-actions{display:flex; gap:8px; padding:14px 20px; border-top:1px solid var(--border);}
+
+.toast{
+  position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px);
+  background:var(--ink); color:var(--bg); font-size:13px; font-weight:500;
+  padding:10px 18px; border-radius:99px; box-shadow:0 8px 24px rgba(0,0,0,.2);
+  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:60;
+  display:flex; align-items:center; gap:8px;
+}
+.toast.show{opacity:1; transform:translate(-50%,0);}
+.toast svg{width:14px;height:14px; color:var(--green);}
+tbody tr.row-flash{animation:flash 1s ease;}
+@keyframes flash{0%{background:var(--accent-soft);}100%{background:transparent;}}
+
+.nav a{cursor:pointer;}
+.user-chip{cursor:pointer; transition:background .12s;}
+.user-chip:hover{background:var(--bg);}
+.avatar.clickable{cursor:pointer;}
+
+.team-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; padding:16px 18px;}
+.team-card{border:1px solid var(--border); border-radius:var(--radius); padding:16px; background:var(--bg);}
+.team-card-top{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
+.team-avatar{width:38px;height:38px;border-radius:50%; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:13.5px; flex-shrink:0;}
+.team-card-top b{font-size:14px; font-weight:600; display:block;}
+.team-card-top span{font-size:11.5px; color:var(--muted);}
+.team-stats{display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;}
+.team-stat{font-size:11px; padding:3px 8px; border-radius:99px; background:var(--surface); border:1px solid var(--border); color:var(--muted); font-weight:500;}
+.team-progress-label{display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted); margin-bottom:5px;}
+
+.settings-block{padding:18px; display:flex; flex-direction:column; gap:10px;}
+.settings-row{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg);}
+.settings-row .s-label{font-size:13.5px; font-weight:600;}
+.settings-row .s-desc{font-size:12px; color:var(--muted); margin-top:2px;}
+.theme-toggle{display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:2px;}
+.theme-toggle button{border:none; background:none; font-size:12px; padding:6px 11px; border-radius:5px; color:var(--muted); font-weight:500;}
+.theme-toggle button.active{background:var(--accent); color:#fff;}
+.switch{width:38px; height:22px; border-radius:99px; background:var(--border); position:relative; border:none; flex-shrink:0; transition:background .15s;}
+.switch::after{content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:transform .15s; box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.switch.on{background:var(--accent);}
+.switch.on::after{transform:translateX(16px);}
+.settings-row.danger .s-label{color:var(--red);}
+
+.modal-card{
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-46%); width:360px; max-width:90vw;
+  background:var(--surface); border-radius:var(--radius); box-shadow:0 20px 50px rgba(0,0,0,.25);
+  z-index:70; opacity:0; pointer-events:none; transition:opacity .18s, transform .18s;
+}
+.modal-card.show{opacity:1; pointer-events:auto; transform:translate(-50%,-50%);}
+.modal-card .m-head{padding:18px 20px 4px; font-size:15.5px; font-weight:700;}
+.modal-card .m-body{padding:12px 20px 4px;}
+.modal-card .m-actions{padding:16px 20px 20px; display:flex; gap:8px;}
+.modal-card .m-text{font-size:13px; color:var(--muted); line-height:1.5; padding:4px 20px 16px;}
+
+.notif-panel{
+  position:fixed; top:calc(62px + env(safe-area-inset-top,0px)); right:20px; width:340px; max-width:90vw;
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:0 16px 40px rgba(0,0,0,.18); z-index:55;
+  opacity:0; transform:translateY(-6px); pointer-events:none; transition:opacity .15s, transform .15s;
+}
+.notif-panel.show{opacity:1; transform:translateY(0); pointer-events:auto;}
+.notif-panel-head{display:flex; justify-content:space-between; align-items:center; padding:13px 16px; border-bottom:1px solid var(--border);}
+.notif-panel-head h4{font-size:13.5px; font-weight:700;}
+.notif-panel-head button{font-size:11.5px; color:var(--accent); background:none; border:none; font-weight:600;}
+.notif-list{max-height:340px; overflow-y:auto;}
+.notif-item{display:flex; gap:10px; padding:11px 16px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .12s;}
+.notif-item:last-child{border-bottom:none;}
+.notif-item:hover{background:var(--bg);}
+.notif-item.unread{background:var(--accent-soft);}
+.notif-item .n-dot{width:7px;height:7px;border-radius:50%;background:var(--accent); margin-top:6px; flex-shrink:0; opacity:0;}
+.notif-item.unread .n-dot{opacity:1;}
+.notif-item p{font-size:13px; line-height:1.4;}
+.notif-item span{font-size:11px; color:var(--muted2);}
+.notif-empty{padding:28px 16px; text-align:center; font-size:12.5px; color:var(--muted);}
+
+.todo-wrap{padding:16px 18px;}
+.todo-add{display:flex; gap:8px; margin-bottom:18px;}
+.todo-add input{flex:1; font-family:inherit; font-size:13.5px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg); padding:9px 12px; outline:none;}
+.todo-add input:focus{border-color:var(--accent);}
+.todo-section-title{font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted2); font-weight:600; margin:16px 0 8px;}
+.todo-section-title:first-child{margin-top:0;}
+.todo-item{display:flex; align-items:center; gap:10px; padding:10px 4px; border-bottom:1px solid var(--border);}
+.todo-item:last-child{border-bottom:none;}
+.todo-check{width:19px;height:19px;border-radius:6px; border:1.5px solid var(--border); flex-shrink:0; background:var(--surface); display:flex; align-items:center; justify-content:center; color:#fff;}
+.todo-check.checked{background:var(--green); border-color:var(--green);}
+.todo-check svg{width:12px;height:12px;}
+.todo-text{flex:1; font-size:13.5px;}
+.todo-item.done .todo-text{color:var(--muted); text-decoration:line-through;}
+.todo-del{width:26px;height:26px;border-radius:6px; border:none; background:none; color:var(--muted2); flex-shrink:0;}
+.todo-del:hover{background:var(--red-soft); color:var(--red);}
+.todo-empty{font-size:12.5px; color:var(--muted); padding:6px 4px 14px;}
+
+@media (max-width:1080px){
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .grid-2{grid-template-columns:1fr;}
+}
+@media (max-width:820px){
+  .sidebar{position:fixed; left:0; top:0; z-index:50; transform:translateX(-100%); transition:transform .2s; box-shadow:0 0 0 100vmax rgba(0,0,0,0); padding-top:calc(20px + env(safe-area-inset-top,0px));}
+  .sidebar.open{transform:translateX(0); box-shadow:2px 0 24px rgba(0,0,0,.15);}
+  .hamburger{display:flex;}
+  .content{padding:18px 16px 50px;}
+  .topbar{padding:12px 16px; padding-top:calc(12px + env(safe-area-inset-top,0px));}
+  .search-wrap{max-width:none;}
+}
+@media (max-width:560px){
+  .stats{grid-template-columns:1fr 1fr;}
+  .stat-value{font-size:23px;}
+  thead th:nth-child(2), tbody td:nth-child(2){display:none;}
+  thead th:last-child, tbody td:last-child{display:none;}
+}
+
+/* ===== Auth gate (Login/Register) — scoped, reuses dashboard's design tokens ===== */
+#authGate{min-height:100vh; display:flex;}
+#authGate .shell{min-height:100vh; width:100%; display:flex;}
+#authGate .brand-pane{flex:1; background:var(--accent); color:#fff; display:flex; flex-direction:column; justify-content:space-between; padding:48px; min-width:0;}
+#authGate .brand-pane .mark{display:flex; align-items:center; gap:10px;}
+#authGate .brand-pane .mark .box{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.16); display:flex;align-items:center;justify-content:center; font-weight:700; font-size:14px;}
+#authGate .brand-pane .mark b{font-size:15px; font-weight:700;}
+#authGate .brand-pane .mark span{display:block; font-size:11.5px; opacity:.75;}
+#authGate .brand-pane .pitch{max-width:440px;}
+#authGate .brand-pane .pitch h2{font-size:32px; font-weight:700; line-height:1.3; letter-spacing:-.01em;}
+#authGate .brand-pane .pitch p{font-size:15.5px; opacity:.8; margin-top:12px; line-height:1.65; max-width:400px;}
+#authGate .brand-pane .foot{font-size:11.5px; opacity:.6;}
+#authGate .form-pane{width:560px; flex-shrink:0; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:48px;}
+#authGate .form-card{width:100%; max-width:440px;}
+#authGate .form-head{margin-bottom:32px;}
+#authGate .form-head h1{font-size:28px; font-weight:700; letter-spacing:-.01em;}
+#authGate .form-head p{font-size:14.5px; color:var(--muted); margin-top:7px;}
+#authGate .afield{margin-bottom:20px;}
+#authGate .afield label{display:block; font-size:13.5px; font-weight:600; color:var(--ink); margin-bottom:7px;}
+#authGate .afield .opt{color:var(--muted2); font-weight:400;}
+#authGate .afield input, #authGate .afield select{
+  width:100%; font-family:inherit; font-size:15px; color:var(--ink);
+  border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface);
+  padding:13px 15px; outline:none; transition:border-color .12s, box-shadow .12s;
+}
+#authGate .afield input:focus, #authGate .afield select:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+#authGate .afield input.err, #authGate .afield select.err{border-color:var(--red);}
+#authGate .field-err{font-size:11.5px; color:var(--red); margin-top:5px; display:none;}
+#authGate .field-err.show{display:block;}
+#authGate .pw-wrap{position:relative;}
+#authGate .pw-toggle{position:absolute; right:9px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--muted2); font-size:11.5px; font-weight:600;}
+#authGate .strength{display:flex; gap:4px; margin-top:8px;}
+#authGate .strength i{flex:1; height:4px; border-radius:99px; background:var(--border); list-style:none;}
+#authGate .strength i.on1{background:var(--red);} #authGate .strength i.on2{background:var(--amber);} #authGate .strength i.on3{background:var(--green);}
+#authGate .strength-label{font-size:11px; color:var(--muted); margin-top:5px;}
+#authGate .row-between{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; font-size:13.5px;}
+#authGate .check-row{display:flex; align-items:flex-start; gap:9px; font-size:13.5px; color:var(--muted);}
+#authGate .check-row input{margin-top:3px; accent-color:var(--accent); width:17px; height:17px; flex-shrink:0;}
+#authGate .link{color:var(--accent); font-weight:600; text-decoration:none;}
+#authGate .link:hover{text-decoration:underline;}
+#authGate .btn-submit{
+  width:100%; padding:14px; border-radius:var(--radius-sm); border:none;
+  background:var(--accent); color:#fff; font-size:15px; font-weight:600;
+  display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px;
+  transition:opacity .12s; box-shadow:var(--shadow);
+}
+#authGate .btn-submit:disabled{opacity:.7; cursor:default;}
+#authGate .auth-spinner{width:15px;height:15px;border-radius:50%; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; animation:authspin .7s linear infinite; display:none;}
+#authGate .btn-submit.loading .auth-spinner{display:inline-block;}
+#authGate .btn-submit.loading .btn-label{opacity:.85;}
+@keyframes authspin{to{transform:rotate(360deg);}}
+#authGate .switch-line{text-align:center; font-size:14px; color:var(--muted); margin-top:26px;}
+#authGate .banner{display:none; align-items:flex-start; gap:8px; background:var(--green-soft); color:var(--green); border-radius:var(--radius-sm); padding:10px 12px; font-size:12.5px; margin-bottom:18px; font-weight:500;}
+#authGate .banner.warn{background:#FCF3E7; color:var(--amber);}
+#authGate .banner.show{display:flex;}
+#authGate .banner svg{width:15px;height:15px; flex-shrink:0; margin-top:1px;}
+#authGate .authview{display:none;}
+#authGate .authview.active{display:block;}
+@media (max-width:860px){
+  #authGate .brand-pane{display:none;}
+  #authGate .form-pane{width:100%;}
+}
+@media (max-width:420px){
+  #authGate .form-pane{padding:20px;}
+}
+
+</style>
+</head>
+<body>
+<div id="authGate">
+<div class="shell">
+  <div class="brand-pane">
+    <div class="mark">
+      <img class="box" src="data:image/png;base64,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" alt="Logo BRI" style="object-fit:contain; background:#fff; padding:0;">
+      <div><b>DMO</b><span>AML, CFT, CPF Group</span></div>
+    </div>
+    <div class="pitch">
+      <h2>Pantau kinerja tim dalam satu tempat.</h2>
+      <p>Dashboard monitoring real-time untuk memantau progres tugas, kepatuhan, dan aktivitas tim AML, CFT, CPF Group.</p>
+    </div>
+    
+  </div>
+
+  <div class="form-pane">
+    <div class="form-card">
+
+      <!-- LOGIN -->
+      <div class="authview active" id="loginView">
+        <div class="form-head">
+          <h1>Masuk ke akun Anda</h1>
+          <p>Selamat datang kembali di DMO Monitor</p>
+        </div>
+        <div class="banner" id="loginBanner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg><span id="loginBannerText"></span></div>
+        <form id="loginForm" novalidate>
+          <div class="afield">
+            <label>Email atau Username</label>
+            <input type="text" id="li-email" autocomplete="username">
+            <div class="field-err" id="li-email-err"></div>
+          </div>
+          <div class="afield">
+            <label>Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="li-password" autocomplete="current-password">
+              <button type="button" class="pw-toggle" data-target="li-password">Lihat</button>
+            </div>
+            <div class="field-err" id="li-password-err"></div>
+          </div>
+          <div class="row-between">
+            <label class="check-row" style="margin-bottom:0;"><input type="checkbox" id="li-remember"> Ingat saya</label>
+            <a href="#" class="link" id="forgotLink">Lupa password?</a>
+          </div>
+          <button type="submit" class="btn-submit" id="loginBtn">
+            <span class="auth-spinner"></span><span class="btn-label">Masuk</span>
+          </button>
+        </form>
+        <div class="switch-line">Belum punya akun? <a href="#" class="link" data-switch="register">Daftar di sini</a></div>
+      </div>
+
+      <!-- REGISTER -->
+      <div class="authview" id="registerView">
+        <div class="form-head">
+          <h1>Buat akun baru</h1>
+          <p>Daftar untuk mengakses DMO Monitor</p>
+        </div>
+        <div class="banner" id="registerBanner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><span id="registerBannerText"></span></div>
+        <form id="registerForm" novalidate>
+          <div class="afield">
+            <label>Nama Lengkap</label>
+            <input type="text" id="rg-name" autocomplete="name">
+            <div class="field-err" id="rg-name-err"></div>
+          </div>
+          <div class="afield">
+            <label>Email</label>
+            <input type="text" id="rg-email" autocomplete="email">
+            <div class="field-err" id="rg-email-err"></div>
+          </div>
+          <div class="afield">
+            <label>Status</label>
+            <select id="rg-phone">
+              <option value="Magang">Magang</option>
+              <option value="Karyawan">Karyawan</option>
+              <option value="Tim Leader">Tim Leader</option>
+            </select>
+          </div>
+          <div class="afield">
+            <label>Password</label>
+            <div class="pw-wrap">
+              <input type="password" id="rg-password" autocomplete="new-password">
+              <button type="button" class="pw-toggle" data-target="rg-password">Lihat</button>
+            </div>
+            <div class="strength" id="strengthBar"><i></i><i></i><i></i></div>
+            <div class="strength-label" id="strengthLabel">Minimal 8 karakter</div>
+            <div class="field-err" id="rg-password-err"></div>
+          </div>
+          <div class="afield">
+            <label>Konfirmasi Password</label>
+            <input type="password" id="rg-password2" autocomplete="new-password">
+            <div class="field-err" id="rg-password2-err"></div>
+          </div>
+          <div class="afield">
+            <label class="check-row"><input type="checkbox" id="rg-terms"> Saya setuju dengan <a href="#" class="link">Syarat &amp; Ketentuan</a></label>
+            <div class="field-err" id="rg-terms-err"></div>
+          </div>
+          <button type="submit" class="btn-submit" id="registerBtn">
+            <span class="auth-spinner"></span><span class="btn-label">Daftar</span>
+          </button>
+        </form>
+        <div class="switch-line">Sudah punya akun? <a href="#" class="link" data-switch="login">Masuk di sini</a></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="app" id="dashboardApp" style="display:none;">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <img class="brand-mark" src="data:image/png;base64,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" alt="Logo BRI" style="object-fit:contain; background:#fff;">
+      <div class="brand-text"><b>DMO</b><span>AML, CFT, CPF Group</span></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Menu</div>
+      <a href="#" class="active" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a href="#" data-page="monitoring">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>
+        Monitoring
+      </a>
+      <a href="#" data-page="laporan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 3 5-8"/></svg>
+        Laporan
+      </a>
+      <a href="#" data-page="tim">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="7" r="3.2"/><path d="M2.5 20c1-3.5 3.6-5.5 6.5-5.5s5.5 2 6.5 5.5"/><circle cx="18" cy="8" r="2.4"/><path d="M15.8 14.2c2.3.4 4 2.1 4.7 4.6"/></svg>
+        Tim
+      </a>
+      <div class="nav-group-label">Lainnya</div>
+      <a href="#" data-page="catatan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h5"/><path d="M7.5 16.2l1.3 1.3 2.7-2.7"/></svg>
+        Catatan
+      </a>
+      <a href="#" data-page="pengaturan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13a7.9 7.9 0 000-2l2-1.5-2-3.4-2.4.7a8 8 0 00-1.7-1L15 3h-6l-.3 2.8a8 8 0 00-1.7 1l-2.4-.7-2 3.4L4.6 11a7.9 7.9 0 000 2l-2 1.5 2 3.4 2.4-.7a8 8 0 001.7 1L9 21h6l.3-2.8a8 8 0 001.7-1l2.4.7 2-3.4-2-1.5z"/></svg>
+        Pengaturan
+      </a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-chip" id="sidebarProfileBtn">
+        <div class="avatar" id="sidebarAvatar">RA</div>
+        <div class="u-meta"><b id="sidebarName">Reyhan A.</b><span id="sidebarRole">Ops Lead</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="searchInput" type="text" placeholder="Cari nama item atau nama...">
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" aria-label="Notifikasi" id="notifBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M9.5 20a2.5 2.5 0 005 0"/></svg>
+          <span class="dot" id="notifDot" style="display:none;"></span>
+        </button>
+        <div class="avatar clickable" id="topbarAvatar">RA</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="page-head">
+        <h1 id="pageTitle">Dashboard Monitoring</h1>
+        <p id="pageSubtitle">Ringkasan aktivitas tim DMO — diperbarui hari ini, 26 September 2026</p>
+      </div>
+
+      <div class="stats" id="statCards" data-pages="dashboard,laporan"></div>
+
+      <div class="grid-2" data-pages="dashboard,laporan">
+        <div class="panel">
+          <div class="panel-head">
+            <div><h3>Tren Penyelesaian Tugas</h3><div class="sub">Jumlah tugas selesai per minggu</div></div>
+            <div class="chart-tabs">
+              <button class="active" data-range="w">Mingguan</button>
+              <button data-range="m">Bulanan</button>
+            </div>
+          </div>
+          <div class="chart-body" id="chartBody"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Aktivitas Terbaru</h3></div></div>
+          <div class="activity-list" id="activityList"></div>
+        </div>
+      </div>
+
+      <div class="table-panel" data-pages="dashboard,monitoring">
+        <div class="table-toolbar">
+          <h3>Daftar Monitoring</h3>
+          <select class="select" id="filterStatus">
+            <option value="">Semua Status</option>
+            <option value="Aktif">Aktif</option>
+            <option value="Selesai">Selesai</option>
+            <option value="Pending">Pending</option>
+            <option value="Terlambat">Terlambat</option>
+          </select>
+          <button class="btn btn-primary" id="addItemBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+            Tambah
+          </button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th data-key="name">Nama Item <span class="arrow"></span></th>
+                <th data-key="pic">Nama <span class="arrow"></span></th>
+                <th data-key="status">Status <span class="arrow"></span></th>
+                <th data-key="progress">Progress <span class="arrow"></span></th>
+                <th data-key="deadline">Deadline <span class="arrow"></span></th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div class="table-empty" id="emptyState" style="display:none;">Tidak ada item yang cocok dengan pencarian/filter.</div>
+      </div>
+
+      <div class="panel" data-pages="tim" style="display:none;">
+        <div class="panel-head"><div><h3>Tim DMO</h3><div class="sub">Beban kerja & progres tiap anggota</div></div></div>
+        <div class="team-grid" id="teamGrid"></div>
+      </div>
+
+      <div class="panel" data-pages="catatan" style="display:none;">
+        <div class="panel-head"><div><h3>Catatan Tim</h3><div class="sub">To-do list pribadi dan riwayat yang sudah selesai</div></div></div>
+        <div class="todo-wrap">
+          <div class="todo-add">
+            <input type="text" id="todoInput" placeholder="Tulis catatan atau tugas baru...">
+            <button class="btn btn-primary" id="todoAddBtn">Tambah</button>
+          </div>
+          <div class="todo-section-title">Perlu Dikerjakan</div>
+          <div id="todoActiveList"></div>
+          <div class="todo-section-title">Sudah Selesai</div>
+          <div id="todoDoneList"></div>
+        </div>
+      </div>
+
+      <div class="panel" data-pages="pengaturan" style="display:none;">
+        <div class="panel-head"><div><h3>Pengaturan</h3><div class="sub">Preferensi tampilan & data</div></div></div>
+        <div class="settings-block">
+          <div class="settings-row">
+            <div><div class="s-label">Tema Tampilan</div><div class="s-desc">Pilih tampilan terang, gelap, atau ikuti sistem</div></div>
+            <div class="theme-toggle" id="themeToggle">
+              <button data-theme="light">Terang</button>
+              <button data-theme="dark">Gelap</button>
+              <button data-theme="system">Sistem</button>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div><div class="s-label">Notifikasi Email</div><div class="s-desc">Kirim ringkasan aktivitas harian</div></div>
+            <button class="switch" id="switchEmail"></button>
+          </div>
+          <div class="settings-row">
+            <div><div class="s-label">Mode Kompak</div><div class="s-desc">Perkecil jarak antar baris tabel</div></div>
+            <button class="switch" id="switchCompact"></button>
+          </div>
+          <div class="settings-row danger">
+            <div><div class="s-label">Reset Data</div><div class="s-desc">Kembalikan seluruh data ke contoh awal</div></div>
+            <button class="btn btn-danger" id="resetDataBtn">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-head">
+    <h2 id="detailTitle">-</h2>
+    <button class="close-btn" id="closeDetail" aria-label="Tutup">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="detail-body" id="detailBody"></div>
+  <div class="detail-actions">
+    <button class="btn btn-danger" id="deleteDetailBtn">Hapus</button>
+    <button class="btn btn-primary btn-block" id="saveDetailBtn">Simpan Perubahan</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+  <span id="toastText">Tersimpan</span>
+</div>
+<div class="modal-card" id="modalCard"></div>
+<div class="notif-panel" id="notifPanel"></div>
+
+<script>
+/* ---------------- Mock data ---------------- */
+const KATEGORI = ["Konten Digital","Campaign Promosi","Event & Aktivasi","Riset & Laporan","Kemitraan"];
+const PIC = ["Arjun","Rita","Rafli","Stephen"];
+const STATUS = ["Aktif","Selesai","Pending","Terlambat"];
+const NAMES = [
+  "Konten reels destinasi pantai","Kampanye #JelajahNusantara","Aktivasi booth pameran travel fair",
+  "Laporan kunjungan wisatawan Q3","Kemitraan hotel mitra baru","Produksi video drone destinasi gunung",
+  "Konten carousel kuliner lokal","Campaign kolaborasi micro-influencer","Event sunset tour media trip",
+  "Riset kepuasan wisatawan","Update peta interaktif destinasi","Konten testimoni wisatawan",
+  "Kampanye low season promo","Koordinasi festival budaya daerah","Laporan performa iklan digital",
+  "Kemitraan dengan agen perjalanan","Sesi foto produk paket wisata","Konten edukasi sustainable tourism",
+  "Campaign akhir tahun liburan","Survey lapangan fasilitas wisata"
+];
+function seedRandom(seed){let s=seed;return()=>{s=(s*9301+49297)%233280;return s/233280;};}
+const rnd = seedRandom(42);
+function pick(arr){return arr[Math.floor(rnd()*arr.length)];}
+const today = new Date(2026,8,26);
+const STORE_KEY = "dmo_monitor_data_v1";
+function generateSeedData(){
+  const rows = [
+    // Stephen
+    { name:"FMR September", pic:"Stephen", status:"Selesai", progress:100, deadline:"2026-09-30", dibuat:"2026-09-01", prioritas:"Sedang", deskripsi:"Laporan FMR bulan September." },
+    { name:"Surat ke DSG dan ESO terkait penegasan ruang kerja dan laptop", pic:"Stephen", status:"Selesai", progress:100, deadline:"2026-09-15", dibuat:"2026-09-01", prioritas:"Sedang", deskripsi:"Penegasan terkait ruang kerja dan laptop." },
+    { name:"Slide Efektifitas program AML", pic:"Stephen", status:"Selesai", progress:100, deadline:"2026-09-10", dibuat:"2026-09-01", prioritas:"Sedang", deskripsi:"Materi slide efektifitas program AML." },
+    { name:"Persiapan monthly meeting BRI", pic:"Stephen", status:"Selesai", progress:100, deadline:"2026-09-25", dibuat:"2026-09-01", prioritas:"Sedang", deskripsi:"Sudah masuk ke dalam FMR." },
+    { name:"Buat Pertanyaan Pop-up September", pic:"Stephen", status:"Selesai", progress:100, deadline:"2026-09-30", dibuat:"2026-09-01", prioritas:"Sedang", deskripsi:"Pertanyaan pop-up bulan September." },
+    { name:"Buat skenario Role-play + form penilaian + materi WISE bulan Oktober", pic:"Stephen", status:"Selesai", progress:100, deadline:"2026-10-01", dibuat:"2026-09-05", prioritas:"Sedang", deskripsi:"Skenario role-play, form penilaian, dan materi WISE untuk Oktober." },
+    { name:"Buat materi Pop-Up untuk bulan Oktober", pic:"Stephen", status:"Aktif", progress:70, deadline:"2026-10-05", dibuat:"2026-09-10", prioritas:"Sedang", deskripsi:"Dalam proses editing." },
+    { name:"Update Rekap Sosialisasi RAC", pic:"Stephen", status:"Selesai", progress:100, deadline:"2026-09-27", dibuat:"2026-09-01", prioritas:"Rendah", deskripsi:"Rekap harian (daily)." },
+    { name:"Susun Program Mystery Shopper AML", pic:"Stephen", status:"Pending", progress:10, deadline:"2026-10-15", dibuat:"2026-09-01", prioritas:"Sedang", deskripsi:"Menunggu arahan manajemen." },
+    { name:"Buat database UKLN (SOP internal, SOP setempat, Gap analysis, temuan audit, List PIC)", pic:"Stephen", status:"Selesai", progress:100, deadline:"2026-09-20", dibuat:"2026-08-20", prioritas:"Sedang", deskripsi:"BRI TW sudah selesai (done)." },
+    // Rafli
+    { name:"Dashboard Agustus", pic:"Rafli", status:"Selesai", progress:100, deadline:"2026-08-31", dibuat:"2026-08-01", prioritas:"Sedang", deskripsi:"Dashboard laporan bulan Agustus." },
+    { name:"Tools Monitoring RAC", pic:"Rafli", status:"Aktif", progress:50, deadline:"2026-10-05", dibuat:"2026-09-05", prioritas:"Sedang", deskripsi:"Masih STR." },
+    { name:"Surat ke RAC terkait Reminder penyampaian evaluasi bulanan dari RAC ke AML", pic:"Rafli", status:"Aktif", progress:40, deadline:"2026-10-01", dibuat:"2026-09-10", prioritas:"Sedang", deskripsi:"" },
+    { name:"Monitoring penghentian transaksi PPATK ke RAC", pic:"Rafli", status:"Aktif", progress:45, deadline:"2026-10-10", dibuat:"2026-09-10", prioritas:"Sedang", deskripsi:"" },
+    // Arjun
+    { name:"AML News", pic:"Arjun", status:"Aktif", progress:55, deadline:"2026-10-05", dibuat:"2026-09-05", prioritas:"Sedang", deskripsi:"On progress, materinya terkait tugas RAC." },
+    { name:"Stress Testing", pic:"Arjun", status:"Aktif", progress:35, deadline:"2026-10-10", dibuat:"2026-09-10", prioritas:"Sedang", deskripsi:"" },
+    { name:"Register RAC Monitoring", pic:"Arjun", status:"Selesai", progress:100, deadline:"2026-09-27", dibuat:"2026-09-01", prioritas:"Rendah", deskripsi:"Weekly update terkait kualitas data." },
+    { name:"Rekap penilaian RAC", pic:"Arjun", status:"Selesai", progress:100, deadline:"2026-09-25", dibuat:"2026-09-01", prioritas:"Sedang", deskripsi:"" },
+    { name:"Evaluasi bulanan ke RAC bulan Agustus 2026", pic:"Arjun", status:"Terlambat", progress:60, deadline:"2026-09-05", dibuat:"2026-08-25", prioritas:"Tinggi", deskripsi:"On progress, dibantu Rafli." },
+    { name:"Surat hasil penilaian maturitas ke setiap RO", pic:"Arjun", status:"Aktif", progress:40, deadline:"2026-10-10", dibuat:"2026-09-10", prioritas:"Sedang", deskripsi:"On progress, masih pembuatan template." },
+    // Rita
+    { name:"Tools Monitoring", pic:"Rita", status:"Selesai", progress:100, deadline:"2026-09-28", dibuat:"2026-09-01", prioritas:"Sedang", deskripsi:"" },
+  ];
+  return rows.map((r,i)=>({ id:i+1, ...r }));
+}
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw){ const parsed = JSON.parse(raw); if(Array.isArray(parsed) && parsed.length) return parsed; }
+  }catch(e){ console.warn("Gagal memuat data lokal:", e); }
+  return generateSeedData();
+}
+function saveData(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+  catch(e){ console.warn("Gagal menyimpan data lokal:", e); }
+}
+let data = loadData();
+if(!localStorage.getItem(STORE_KEY)) saveData();
+
+/* ---------------- Stat cards ---------------- */
+function renderStats(){
+  const active = data.filter(d=>d.status==="Aktif").length;
+  const done = data.filter(d=>d.status==="Selesai").length;
+  const late = data.filter(d=>d.status==="Terlambat").length;
+  const avgProgress = data.length? Math.round(data.reduce((a,d)=>a+d.progress,0)/data.length) : 0;
+  const stats = [
+    {key:"Aktif", label:"Tugas Aktif", value:active, delta:"+3 minggu ini", dir:"up", color:"var(--blue)", bg:"var(--blue-soft)",
+     icon:'<path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/>'},
+    {key:"", label:"Rata-rata Progress Tim", value:avgProgress+"%", delta:"+5% dari bulan lalu", dir:"up", color:"var(--accent)", bg:"var(--accent-soft)",
+     icon:'<path d="M3 3v18h18"/><path d="M7 15l4-6 3 3 5-8"/>'},
+    {key:"Terlambat", label:"Terlambat", value:late, delta:late>0?"Perlu perhatian":"Aman", dir:late>0?"down":"", color:"var(--red)", bg:"var(--red-soft)",
+     icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/>'},
+    {key:"Selesai", label:"Selesai", value:done, delta:"+"+Math.max(1,Math.round(done*0.2))+" minggu ini", dir:"up", color:"var(--green)", bg:"var(--green-soft)",
+     icon:'<path d="M20 6L9 17l-5-5"/>'}
+  ];
+  document.getElementById("statCards").innerHTML = stats.map(s=>`
+    <div class="stat-card ${state.status===s.key && s.key ? 'is-active':''}" data-status="${s.key}" tabindex="0">
+      <div class="stat-top">
+        <span class="stat-label">${s.label}</span>
+        <div class="stat-icon" style="background:${s.bg};color:${s.color}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${s.icon}</svg>
+        </div>
+      </div>
+      <div class="stat-value">${s.value}</div>
+      <div class="stat-delta ${s.dir}">
+        ${s.dir==="up"?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 15l7-7 7 7"/></svg>':s.dir==="down"?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 9l-7 7-7-7"/></svg>':''}
+        ${s.delta}
+      </div>
+    </div>
+  `).join("");
+  document.querySelectorAll(".stat-card").forEach(card=>{
+    card.addEventListener("click",()=>{
+      const key = card.dataset.status;
+      state.status = state.status===key ? "" : key;
+      document.getElementById("filterStatus").value = state.status;
+      renderStats(); renderTable();
+      document.querySelector(".table-panel").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  });
+}
+
+/* ---------------- Chart (custom SVG line) ---------------- */
+const weekly = [12,15,11,18,22,19,25,28,24,30];
+const monthly = [58,64,60,72,80,76];
+function renderChart(vals){
+  const w=560,h=180,pad={t:14,r:14,b:24,l:28};
+  const max = Math.max(...vals)*1.15;
+  const stepX = (w-pad.l-pad.r)/(vals.length-1);
+  const pts = vals.map((v,i)=>{
+    const x = pad.l + i*stepX;
+    const y = pad.t + (1 - v/max) * (h-pad.t-pad.b);
+    return [x,y];
+  });
+  const path = pts.map((p,i)=>(i===0?"M":"L")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+  const area = path + ` L${pts[pts.length-1][0].toFixed(1)},${h-pad.b} L${pts[0][0].toFixed(1)},${h-pad.b} Z`;
+  const gridLines = [0.25,0.5,0.75,1].map(f=>{
+    const y = pad.t + (1-f)*(h-pad.t-pad.b);
+    return `<line class="svg-grid" x1="${pad.l}" x2="${w-pad.r}" y1="${y}" y2="${y}"/>`;
+  }).join("");
+  const dots = pts.map(p=>`<circle class="svg-dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3"/>`).join("");
+  document.getElementById("chartBody").innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" width="100%" height="200" preserveAspectRatio="none" role="img" aria-label="Grafik tren">
+      <defs><linearGradient id="gradFill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+      </linearGradient></defs>
+      ${gridLines}
+      <path class="svg-area" d="${area}"/>
+      <path class="svg-line" d="${path}"/>
+      ${dots}
+    </svg>`;
+}
+renderChart(weekly);
+document.querySelectorAll(".chart-tabs button").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".chart-tabs button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    renderChart(btn.dataset.range==="w"?weekly:monthly);
+  });
+});
+
+/* ---------------- Activity feed (dinamis, mengikuti aksi nyata) ---------------- */
+const ACTIVITY_KEY = "dmo_activity_v1";
+function loadActivity(){
+  try{ const raw = localStorage.getItem(ACTIVITY_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  // Seed awal diturunkan dari data monitoring yang ada, supaya tidak kosong di kunjungan pertama
+  const now = Date.now();
+  const seed = [];
+  const recentDone = data.filter(d=>d.status==="Selesai").slice(0,3);
+  recentDone.forEach((d,i)=> seed.push({ t:`<b>${d.pic}</b> menyelesaikan “${d.name}”`, c:"var(--green)", ts: now - (i+1)*45*60000 }));
+  const late = data.find(d=>d.status==="Terlambat");
+  if(late) seed.push({ t:`“${late.name}” berstatus terlambat`, c:"var(--red)", ts: now - 3*3600000 });
+  return seed;
+}
+function saveActivity(){ try{ localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activityLog)); }catch(e){} }
+let activityLog = loadActivity();
+function timeAgo(ts){
+  const diff = Math.max(0, Date.now() - ts);
+  const min = Math.floor(diff/60000);
+  if(min < 1) return "Baru saja";
+  if(min < 60) return `${min} menit lalu`;
+  const hr = Math.floor(min/60);
+  if(hr < 24) return `${hr} jam lalu`;
+  const day = Math.floor(hr/24);
+  if(day === 1) return "Kemarin";
+  return `${day} hari lalu`;
+}
+function logActivity(text, color){
+  activityLog.unshift({ t:text, c:color||"var(--blue)", ts: Date.now() });
+  activityLog = activityLog.slice(0, 25);
+  saveActivity();
+  renderActivityFeed();
+}
+function renderActivityFeed(){
+  const list = document.getElementById("activityList");
+  if(!list) return;
+  list.innerHTML = activityLog.length ? activityLog.map(a=>`
+    <div class="activity-item">
+      <span class="act-dot" style="background:${a.c}"></span>
+      <div class="act-body"><p>${a.t}</p><span>${timeAgo(a.ts)}</span></div>
+    </div>`).join("") : `<div class="activity-item"><div class="act-body"><p>Belum ada aktivitas.</p></div></div>`;
+}
+renderActivityFeed();
+
+/* ---------------- Table: search, filter, sort ---------------- */
+let sortKey="deadline", sortDir=1;
+const state = { search:"", status:"" };
+
+function statusClass(s){return {"Aktif":"aktif","Selesai":"selesai","Pending":"pending","Terlambat":"terlambat"}[s];}
+function initials(n){return n.split(" ").map(p=>p[0]).slice(0,2).join("").toUpperCase();}
+function fmtDate(d){return new Date(d).toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"});}
+
+function getFiltered(){
+  let rows = data.filter(d=>{
+    const q = state.search.toLowerCase();
+    const matchQ = !q || d.name.toLowerCase().includes(q) || d.pic.toLowerCase().includes(q);
+    const matchStatus = !state.status || d.status===state.status;
+    return matchQ && matchStatus;
+  });
+  rows.sort((a,b)=>{
+    let va=a[sortKey], vb=b[sortKey];
+    if(typeof va==="string") va=va.toLowerCase();
+    if(typeof vb==="string") vb=vb.toLowerCase();
+    if(va<vb) return -1*sortDir;
+    if(va>vb) return 1*sortDir;
+    return 0;
+  });
+  return rows;
+}
+
+function renderTable(){
+  const rows = getFiltered();
+  const body = document.getElementById("tableBody");
+  const empty = document.getElementById("emptyState");
+  if(rows.length===0){ body.innerHTML=""; empty.style.display="block"; return; }
+  empty.style.display="none";
+  body.innerHTML = rows.map(d=>`
+    <tr data-id="${d.id}">
+      <td><div class="item-name">${d.name}<span>Dibuat ${fmtDate(d.dibuat)}</span></div></td>
+      <td><div class="pic"><div class="avatar" style="width:22px;height:22px;font-size:10px;">${initials(d.pic)}</div>${d.pic}</div></td>
+      <td><span class="badge ${statusClass(d.status)}">${d.status}</span></td>
+      <td><div class="progress-cell"><div class="progress-track"><div class="progress-fill" style="width:${d.progress}%"></div></div><span class="mono" style="font-size:11.5px;color:var(--muted)">${d.progress}%</span></div></td>
+      <td>${fmtDate(d.deadline)}</td>
+    </tr>`).join("");
+  body.querySelectorAll("tr").forEach(tr=>{
+    tr.addEventListener("click",()=>openDetail(+tr.dataset.id));
+  });
+  document.querySelectorAll("thead th").forEach(th=>{
+    const arrow = th.querySelector(".arrow");
+    arrow.textContent = th.dataset.key===sortKey ? (sortDir===1?"↑":"↓") : "";
+  });
+}
+
+document.getElementById("searchInput").addEventListener("input",e=>{state.search=e.target.value; renderTable();});
+document.getElementById("filterStatus").addEventListener("change",e=>{state.status=e.target.value; renderTable();});
+document.querySelectorAll("thead th").forEach(th=>{
+  th.addEventListener("click",()=>{
+    const key = th.dataset.key;
+    if(sortKey===key){ sortDir*=-1; } else { sortKey=key; sortDir=1; }
+    renderTable();
+  });
+});
+renderStats();
+renderTable();
+
+/* ---------------- Toast ---------------- */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById("toast");
+  document.getElementById("toastText").textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+/* ---------------- Detail panel ---------------- */
+const overlay = document.getElementById("overlay");
+const panel = document.getElementById("detailPanel");
+let activeId = null;
+
+function openDetail(id){
+  activeId = id;
+  const d = data.find(x=>x.id===id);
+  document.getElementById("detailTitle").textContent = "Detail Item";
+  document.getElementById("detailBody").innerHTML = `
+    <div class="field">
+      <label>Nama Item</label>
+      <input type="text" id="f-name" value="${d.name.replace(/"/g,'&quot;')}">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Nama</label>
+        <select id="f-pic">${PIC.map(p=>`<option ${p===d.pic?"selected":""}>${p}</option>`).join("")}</select>
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select id="f-status">${STATUS.map(s=>`<option ${s===d.status?"selected":""}>${s}</option>`).join("")}</select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Prioritas</label>
+      <select id="f-prioritas">${["Tinggi","Sedang","Rendah"].map(p=>`<option ${p===d.prioritas?"selected":""}>${p}</option>`).join("")}</select>
+    </div>
+    <div class="field">
+      <label>Progress</label>
+      <div class="range-row">
+        <input type="range" id="f-progress" min="0" max="100" value="${d.progress}">
+        <span class="range-val" id="f-progress-val">${d.progress}%</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Deadline</label>
+      <input type="date" id="f-deadline" value="${d.deadline}">
+    </div>
+    <div class="field">
+      <label>Deskripsi</label>
+      <textarea id="f-deskripsi">${d.deskripsi}</textarea>
+    </div>
+  `;
+  document.getElementById("f-progress").addEventListener("input",e=>{
+    document.getElementById("f-progress-val").textContent = e.target.value+"%";
+  });
+  overlay.classList.add("show");
+  panel.classList.add("show");
+  setTimeout(()=>document.getElementById("f-name").focus(),200);
+}
+
+function saveDetail(){
+  if(activeId==null) return;
+  const d = data.find(x=>x.id===activeId);
+  const oldStatus = d.status;
+  d.name = document.getElementById("f-name").value.trim() || d.name;
+  d.pic = document.getElementById("f-pic").value;
+  d.status = document.getElementById("f-status").value;
+  d.prioritas = document.getElementById("f-prioritas").value;
+  d.progress = +document.getElementById("f-progress").value;
+  d.deadline = document.getElementById("f-deadline").value;
+  d.deskripsi = document.getElementById("f-deskripsi").value.trim();
+  saveData();
+  renderStats(); renderTable();
+  const row = document.querySelector(`tr[data-id="${activeId}"]`);
+  if(row) row.classList.add("row-flash");
+  if(oldStatus!==d.status && d.status==="Selesai"){
+    logActivity(`<b>${profile.name}</b> menyelesaikan “${d.name}”`, "var(--green)");
+  }else if(oldStatus!==d.status){
+    logActivity(`<b>${profile.name}</b> mengubah status “${d.name}” menjadi ${d.status}`, "var(--blue)");
+  }else{
+    logActivity(`<b>${profile.name}</b> memperbarui “${d.name}”`, "var(--blue)");
+  }
+  showToast("Perubahan disimpan");
+  closeDetail();
+}
+
+function deleteDetail(){
+  if(activeId==null) return;
+  if(!confirm("Hapus item ini dari daftar monitoring?")) return;
+  const d = data.find(x=>x.id===activeId);
+  data = data.filter(x=>x.id!==activeId);
+  saveData();
+  renderStats(); renderTable();
+  if(d) logActivity(`<b>${profile.name}</b> menghapus item “${d.name}”`, "var(--red)");
+  showToast("Item dihapus");
+  closeDetail();
+}
+
+function closeDetail(){ overlay.classList.remove("show"); panel.classList.remove("show"); activeId=null; }
+overlay.addEventListener("click",closeDetail);
+document.getElementById("closeDetail").addEventListener("click",closeDetail);
+document.getElementById("saveDetailBtn").addEventListener("click",saveDetail);
+document.getElementById("deleteDetailBtn").addEventListener("click",deleteDetail);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeDetail(); });
+
+document.getElementById("addItemBtn").addEventListener("click",()=>{
+  const newId = data.length ? Math.max(...data.map(d=>d.id))+1 : 1;
+  const item = {
+    id:newId, name:"Item baru", pic:PIC[0], status:"Pending", progress:0,
+    deadline: new Date().toISOString().slice(0,10),
+    deskripsi:"", dibuat: new Date().toISOString().slice(0,7)+"-01"
+  };
+  data.unshift(item);
+  saveData();
+  renderStats(); renderTable();
+  logActivity(`<b>${profile.name}</b> menambahkan item baru ke Monitoring`, "var(--blue)");
+  openDetail(newId);
+});
+
+document.getElementById("resetDataBtn").addEventListener("click",()=>{
+  openModal("Reset Data", `<p class="m-text" style="padding:0 0 8px;">Reset ke data contoh awal? Semua perubahan lokal di perangkat ini akan hilang.</p>`,
+    `<button class="btn btn-ghost btn-block" onclick="closeModal()">Batal</button>
+     <button class="btn btn-danger btn-block" id="confirmResetBtn">Ya, Reset</button>`);
+  document.getElementById("confirmResetBtn").addEventListener("click",()=>{
+    data = generateSeedData();
+    saveData();
+    state.search=""; state.status="";
+    document.getElementById("searchInput").value="";
+    document.getElementById("filterStatus").value="";
+    renderStats(); renderTable(); renderTeam();
+    closeModal();
+    showToast("Data direset");
+  });
+});
+
+/* ---------------- Generic centered modal ---------------- */
+const modalCard = document.getElementById("modalCard");
+function openModal(title, bodyHtml, actionsHtml){
+  modalCard.innerHTML = `<div class="m-head">${title}</div><div class="m-body">${bodyHtml}</div><div class="m-actions">${actionsHtml}</div>`;
+  overlay.classList.add("show");
+  modalCard.classList.add("show");
+}
+function closeModal(){ modalCard.classList.remove("show"); overlay.classList.remove("show"); }
+overlay.addEventListener("click",()=>{ closeModal(); });
+
+/* ---------------- Profile (interactive) ---------------- */
+const PROFILE_KEY = "dmo_profile_v1";
+function loadProfile(){
+  try{ const raw = localStorage.getItem(PROFILE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return { name:"Reyhan A.", role:"Ops Lead" };
+}
+function saveProfile(p){ try{ localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }catch(e){} }
+let profile = loadProfile();
+function renderProfileChip(){
+  const init = profile.name.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+  document.getElementById("sidebarAvatar").textContent = init;
+  document.getElementById("topbarAvatar").textContent = init;
+  document.getElementById("sidebarName").textContent = profile.name;
+  document.getElementById("sidebarRole").textContent = profile.role;
+}
+function openProfileModal(){
+  openModal("Profil Saya", `
+    <div class="field"><label>Nama</label><input type="text" id="p-name" value="${profile.name.replace(/"/g,'&quot;')}"></div>
+    <div class="field" style="margin-bottom:2px;"><label>Peran</label><input type="text" id="p-role" value="${profile.role.replace(/"/g,'&quot;')}"></div>
+  `,
+  `<button class="btn btn-danger" id="logoutBtn">Keluar</button>
+   <button class="btn btn-primary btn-block" id="saveProfileBtn">Simpan</button>`);
+  document.getElementById("logoutBtn").addEventListener("click",()=>{
+    closeModal();
+    exitToLogin();
+  });
+  document.getElementById("saveProfileBtn").addEventListener("click",()=>{
+    profile.name = document.getElementById("p-name").value.trim() || profile.name;
+    profile.role = document.getElementById("p-role").value.trim() || profile.role;
+    saveProfile(profile);
+    renderProfileChip();
+    closeModal();
+    showToast("Profil diperbarui");
+  });
+}
+document.getElementById("sidebarProfileBtn").addEventListener("click",openProfileModal);
+document.getElementById("topbarAvatar").addEventListener("click",openProfileModal);
+renderProfileChip();
+
+/* ---------------- Tim page ---------------- */
+function renderTeam(){
+  const grid = document.getElementById("teamGrid");
+  if(!grid) return;
+  grid.innerHTML = PIC.map(name=>{
+    const items = data.filter(d=>d.pic===name);
+    const total = items.length;
+    const done = items.filter(d=>d.status==="Selesai").length;
+    const late = items.filter(d=>d.status==="Terlambat").length;
+    const avg = total ? Math.round(items.reduce((a,d)=>a+d.progress,0)/total) : 0;
+    const init = name.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+    return `
+      <div class="team-card">
+        <div class="team-card-top">
+          <div class="team-avatar">${init}</div>
+          <div><b>${name}</b><span>${total} item ditangani</span></div>
+        </div>
+        <div class="team-stats">
+          <span class="team-stat">${done} selesai</span>
+          <span class="team-stat">${late} terlambat</span>
+        </div>
+        <div class="team-progress-label"><span>Rata-rata progress</span><span>${avg}%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${avg}%"></div></div>
+      </div>`;
+  }).join("");
+}
+
+/* ---------------- Settings: theme & switches ---------------- */
+const SETTINGS_KEY = "dmo_settings_v1";
+function loadSettings(){
+  try{ const raw = localStorage.getItem(SETTINGS_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return { theme:"system", email:true, compact:false };
+}
+function saveSettings(){ try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }catch(e){} }
+let settings = loadSettings();
+function applyTheme(){
+  document.documentElement.removeAttribute("data-theme");
+  if(settings.theme==="light") document.documentElement.setAttribute("data-theme","light");
+  if(settings.theme==="dark") document.documentElement.setAttribute("data-theme","dark");
+  document.querySelectorAll("#themeToggle button").forEach(b=>b.classList.toggle("active", b.dataset.theme===settings.theme));
+}
+function applySwitches(){
+  document.getElementById("switchEmail").classList.toggle("on", settings.email);
+  document.getElementById("switchCompact").classList.toggle("on", settings.compact);
+  document.querySelectorAll("tbody td, tbody tr").forEach(el=>{ el.style.paddingTop = settings.compact ? "7px" : ""; el.style.paddingBottom = settings.compact ? "7px" : ""; });
+}
+document.querySelectorAll("#themeToggle button").forEach(b=>{
+  b.addEventListener("click",()=>{ settings.theme=b.dataset.theme; saveSettings(); applyTheme(); showToast("Tema diperbarui"); });
+});
+document.getElementById("switchEmail").addEventListener("click",()=>{ settings.email=!settings.email; saveSettings(); applySwitches(); });
+document.getElementById("switchCompact").addEventListener("click",()=>{ settings.compact=!settings.compact; saveSettings(); applySwitches(); });
+applyTheme(); applySwitches();
+
+/* ---------------- Notifications (interactive) ---------------- */
+const NOTIF_KEY = "dmo_notif_v1";
+function seedNotifs(){
+  return [
+    {id:1, text:"Stephen menyelesaikan \u201cLaporan kunjungan wisatawan Q3\u201d", time:"12 menit lalu", read:false},
+    {id:2, text:"\u201cEvent sunset tour media trip\u201d terlambat 2 hari, perlu ditinjau", time:"3 jam lalu", read:false},
+    {id:3, text:"Rafli menambahkan item baru ke Monitoring", time:"5 jam lalu", read:false},
+    {id:4, text:"Rita mengunggah draf \u201cUpdate peta interaktif destinasi\u201d", time:"Kemarin", read:true},
+    {id:5, text:"Arjun menunggu review untuk 2 item aktif", time:"2 hari lalu", read:true},
+  ];
+}
+function loadNotifs(){
+  try{ const raw = localStorage.getItem(NOTIF_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return seedNotifs();
+}
+function saveNotifs(){ try{ localStorage.setItem(NOTIF_KEY, JSON.stringify(notifs)); }catch(e){} }
+let notifs = loadNotifs();
+function renderNotifDot(){
+  const unread = notifs.filter(n=>!n.read).length;
+  document.getElementById("notifDot").style.display = unread>0 ? "" : "none";
+}
+function renderNotifPanel(){
+  const list = notifs.length ? notifs.map(n=>`
+    <div class="notif-item ${n.read?"":"unread"}" data-id="${n.id}">
+      <span class="n-dot"></span>
+      <div><p>${n.text}</p><span>${n.time}</span></div>
+    </div>`).join("") : `<div class="notif-empty">Belum ada notifikasi.</div>`;
+  document.getElementById("notifPanel").innerHTML = `
+    <div class="notif-panel-head"><h4>Notifikasi</h4><button id="notifReadAllBtn">Tandai semua dibaca</button></div>
+    <div class="notif-list">${list}</div>`;
+  document.querySelectorAll(".notif-item").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const n = notifs.find(x=>x.id===+el.dataset.id);
+      n.read = true; saveNotifs(); renderNotifPanel(); renderNotifDot();
+    });
+  });
+  const readAllBtn = document.getElementById("notifReadAllBtn");
+  if(readAllBtn) readAllBtn.addEventListener("click",e=>{
+    e.stopPropagation();
+    notifs.forEach(n=>n.read=true); saveNotifs(); renderNotifPanel(); renderNotifDot();
+  });
+}
+const notifPanel = document.getElementById("notifPanel");
+document.getElementById("notifBtn").addEventListener("click",e=>{
+  e.stopPropagation();
+  renderNotifPanel();
+  notifPanel.classList.toggle("show");
+});
+document.addEventListener("click",e=>{
+  if(notifPanel.classList.contains("show") && !notifPanel.contains(e.target) && e.target.id!=="notifBtn"){
+    notifPanel.classList.remove("show");
+  }
+});
+renderNotifDot();
+
+/* ---------------- Catatan: to-do list ---------------- */
+const NOTES_KEY = "dmo_notes_v1";
+function seedNotes(){
+  return [
+    {id:1, text:"Follow up laporan Q3 ke manajemen", done:false},
+    {id:2, text:"Review draf konten reels pantai", done:false},
+    {id:3, text:"Konfirmasi jadwal media trip minggu depan", done:false},
+    {id:4, text:"Siapkan brief campaign akhir tahun", done:true},
+    {id:5, text:"Kirim laporan mingguan ke tim", done:true},
+  ];
+}
+function loadNotes(){
+  try{ const raw = localStorage.getItem(NOTES_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return seedNotes();
+}
+function saveNotes(){ try{ localStorage.setItem(NOTES_KEY, JSON.stringify(notes)); }catch(e){} }
+let notes = loadNotes();
+function todoItemHtml(n){
+  return `
+    <div class="todo-item ${n.done?"done":""}" data-id="${n.id}">
+      <button class="todo-check ${n.done?"checked":""}" data-action="toggle">
+        ${n.done?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>':''}
+      </button>
+      <span class="todo-text">${n.text}</span>
+      <button class="todo-del" data-action="delete" aria-label="Hapus">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>`;
+}
+function renderTodos(){
+  const active = notes.filter(n=>!n.done);
+  const done = notes.filter(n=>n.done);
+  document.getElementById("todoActiveList").innerHTML = active.length ? active.map(todoItemHtml).join("") : `<div class="todo-empty">Tidak ada tugas aktif. Tambahkan satu di atas.</div>`;
+  document.getElementById("todoDoneList").innerHTML = done.length ? done.map(todoItemHtml).join("") : `<div class="todo-empty">Belum ada yang selesai.</div>`;
+  document.querySelectorAll("#todoActiveList [data-action], #todoDoneList [data-action]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const id = +btn.closest(".todo-item").dataset.id;
+      const n = notes.find(x=>x.id===id);
+      if(btn.dataset.action==="toggle"){
+        n.done=!n.done; saveNotes(); renderTodos();
+        logActivity(n.done ? `<b>${profile.name}</b> menyelesaikan catatan “${n.text}”` : `<b>${profile.name}</b> membuka kembali catatan “${n.text}”`, n.done ? "var(--green)" : "var(--blue)");
+      }
+      else{
+        notes = notes.filter(x=>x.id!==id); saveNotes(); renderTodos();
+        logActivity(`<b>${profile.name}</b> menghapus catatan “${n.text}”`, "var(--red)");
+      }
+    });
+  });
+}
+function addTodo(){
+  const input = document.getElementById("todoInput");
+  const text = input.value.trim();
+  if(!text) return;
+  const newId = notes.length ? Math.max(...notes.map(n=>n.id))+1 : 1;
+  notes.unshift({id:newId, text, done:false});
+  saveNotes(); renderTodos();
+  logActivity(`<b>${profile.name}</b> menambahkan catatan “${text}”`, "var(--blue)");
+  input.value=""; input.focus();
+}
+document.getElementById("todoAddBtn").addEventListener("click",addTodo);
+document.getElementById("todoInput").addEventListener("keydown",e=>{ if(e.key==="Enter") addTodo(); });
+
+/* ---------------- Page navigation ---------------- */
+const PAGE_META = {
+  dashboard:{title:"Dashboard Monitoring", sub:"Ringkasan aktivitas tim DMO — diperbarui hari ini, 26 September 2026"},
+  monitoring:{title:"Monitoring", sub:"Semua item yang sedang dipantau tim DMO"},
+  laporan:{title:"Laporan", sub:"Ringkasan performa dan tren tim dari waktu ke waktu"},
+  tim:{title:"Tim", sub:"Beban kerja dan performa tiap anggota tim DMO"},
+  catatan:{title:"Catatan Tim", sub:"To-do list pribadi dan riwayat yang sudah selesai"},
+  pengaturan:{title:"Pengaturan", sub:"Kelola preferensi tampilan dan data lokal"}
+};
+function setPage(page){
+  document.querySelectorAll(".nav a").forEach(a=>a.classList.toggle("active", a.dataset.page===page));
+  document.getElementById("pageTitle").textContent = PAGE_META[page].title;
+  document.getElementById("pageSubtitle").textContent = PAGE_META[page].sub;
+  document.querySelectorAll("[data-pages]").forEach(el=>{
+    el.style.display = el.dataset.pages.split(",").includes(page) ? "" : "none";
+  });
+  if(page==="tim") renderTeam();
+  if(page==="catatan") renderTodos();
+  if(window.innerWidth<=820) sidebar.classList.remove("open");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+document.querySelectorAll(".nav a[data-page]").forEach(a=>{
+  a.addEventListener("click",e=>{ e.preventDefault(); setPage(a.dataset.page); });
+});
+
+/* ---------------- Mobile sidebar ---------------- */
+const sidebar = document.getElementById("sidebar");
+document.getElementById("hamburgerBtn").addEventListener("click",e=>{ e.stopPropagation(); sidebar.classList.toggle("open"); });
+document.addEventListener("click",e=>{
+  if(window.innerWidth<=820 && sidebar.classList.contains("open") && !sidebar.contains(e.target) && e.target.id!=="hamburgerBtn"){
+    sidebar.classList.remove("open");
+  }
+});
+</script>
+
+<script>
+/* ===== Auth gate logic (Login/Register), merged in-page ===== */
+
+const USERS_KEY = "dmo_users_v1";
+function loadUsers(){ try{ const r = localStorage.getItem(USERS_KEY); if(r) return JSON.parse(r); }catch(e){} return []; }
+function saveUsers(u){ try{ localStorage.setItem(USERS_KEY, JSON.stringify(u)); }catch(e){} }
+let users = loadUsers();
+function usernameOf(email){ return email.split("@")[0].toLowerCase(); }
+
+/* ---- view switching ---- */
+function showView(name){
+  document.getElementById("loginView").classList.toggle("active", name==="login");
+  document.getElementById("registerView").classList.toggle("active", name==="register");
+  document.getElementById("loginBanner").classList.remove("show");
+  document.getElementById("registerBanner").classList.remove("show");
+}
+document.querySelectorAll("[data-switch]").forEach(el=>{
+  el.addEventListener("click",e=>{ e.preventDefault(); showView(el.dataset.switch); });
+});
+if(location.hash==="#register") showView("register");
+
+/* ---- password visibility ---- */
+document.querySelectorAll(".pw-toggle").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const input = document.getElementById(btn.dataset.target);
+    const isPw = input.type==="password";
+    input.type = isPw ? "text" : "password";
+    btn.textContent = isPw ? "Sembunyikan" : "Lihat";
+  });
+});
+
+/* ---- validation helpers ---- */
+function setError(id, msg){
+  const input = document.getElementById(id);
+  const err = document.getElementById(id+"-err");
+  if(msg){ input.classList.add("err"); err.textContent = msg; err.classList.add("show"); }
+  else{ input.classList.remove("err"); err.classList.remove("show"); }
+  return !msg;
+}
+function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || /^[a-zA-Z0-9._-]{3,}$/.test(v); }
+function isStrictEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+/* ---- masuk ke dashboard / keluar ke login, tanpa pindah halaman ---- */
+function enterDashboard(name, role){
+  if(name){ profile.name = name; saveProfile(profile); renderProfileChip(); }
+  if(role){ profile.role = role; saveProfile(profile); renderProfileChip(); }
+  document.getElementById("authGate").style.display = "none";
+  document.getElementById("dashboardApp").style.display = "flex";
+  setPage("dashboard");
+  window.scrollTo(0,0);
+}
+function exitToLogin(){
+  document.getElementById("dashboardApp").style.display = "none";
+  document.getElementById("authGate").style.display = "flex";
+  showView("login");
+  document.getElementById("li-email").value = "";
+  document.getElementById("li-password").value = "";
+  window.scrollTo(0,0);
+}
+
+/* ---- LOGIN ---- */
+document.getElementById("loginForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const identifier = document.getElementById("li-email").value.trim();
+  const pw = document.getElementById("li-password").value;
+  let ok = true;
+  ok = setError("li-email", identifier ? (isValidEmail(identifier) ? "" : "Masukkan email atau username yang valid") : "Email/Username wajib diisi") && ok;
+  ok = setError("li-password", pw ? (pw.length>=8 ? "" : "Password minimal 8 karakter") : "Password wajib diisi") && ok;
+  if(!ok) return;
+
+  const btn = document.getElementById("loginBtn");
+  const found = isStrictEmail(identifier)
+    ? users.find(u=>u.email.toLowerCase()===identifier.toLowerCase())
+    : users.find(u=>usernameOf(u.email)===identifier.toLowerCase());
+
+  if(found){
+    btn.classList.add("loading"); btn.disabled = true;
+    setTimeout(()=>{
+      btn.classList.remove("loading"); btn.disabled = false;
+      document.getElementById("loginForm").reset();
+      enterDashboard(found.name, found.status);
+    }, 500);
+    return;
+  }
+
+  // Akun belum terdaftar -> tidak ada navigasi keluar, jadi delay untuk efek loading aman dipakai
+  btn.classList.add("loading"); btn.disabled = true;
+  setTimeout(()=>{
+    btn.classList.remove("loading"); btn.disabled = false;
+    showView("register");
+    document.getElementById("registerBannerText").textContent = `Akun "${identifier}" belum terdaftar. Silakan daftar terlebih dahulu.`;
+    document.getElementById("registerBanner").classList.add("warn");
+    document.getElementById("registerBanner").classList.add("show");
+  }, 900);
+});
+
+document.getElementById("forgotLink").addEventListener("click",e=>{
+  e.preventDefault();
+  const b = document.getElementById("loginBanner");
+  document.getElementById("loginBannerText").textContent = "Link reset password telah dikirim (simulasi) ke email Anda.";
+  b.classList.add("show");
+});
+
+/* ---- REGISTER: password strength ---- */
+function calcStrength(pw){
+  let score = 0;
+  if(pw.length>=8) score++;
+  if(/[A-Z]/.test(pw) && /[0-9]/.test(pw)) score++;
+  if(/[^A-Za-z0-9]/.test(pw) && pw.length>=10) score++;
+  return score;
+}
+document.getElementById("rg-password").addEventListener("input",e=>{
+  const score = calcStrength(e.target.value);
+  const bars = document.querySelectorAll("#strengthBar i");
+  bars.forEach((b,i)=>{ b.className = i<score ? ["on1","on2","on3"][score-1] : ""; });
+  const labels = ["Minimal 8 karakter","Lemah","Sedang","Kuat"];
+  document.getElementById("strengthLabel").textContent = e.target.value ? labels[score] : "Minimal 8 karakter";
+});
+
+/* ---- REGISTER submit ---- */
+document.getElementById("registerForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name = document.getElementById("rg-name").value.trim();
+  const email = document.getElementById("rg-email").value.trim();
+  const status = document.getElementById("rg-phone").value;
+  const pw = document.getElementById("rg-password").value;
+  const pw2 = document.getElementById("rg-password2").value;
+  const terms = document.getElementById("rg-terms").checked;
+  let ok = true;
+  ok = setError("rg-name", name ? "" : "Nama lengkap wajib diisi") && ok;
+  ok = setError("rg-email", email ? (isStrictEmail(email) ? "" : "Format email tidak valid") : "Email wajib diisi") && ok;
+  ok = setError("rg-password", pw ? (pw.length>=8 ? "" : "Password minimal 8 karakter") : "Password wajib diisi") && ok;
+  ok = setError("rg-password2", pw2 ? (pw2===pw ? "" : "Konfirmasi password tidak sama") : "Konfirmasi password wajib diisi") && ok;
+  const termsErr = document.getElementById("rg-terms-err");
+  if(!terms){ termsErr.textContent = "Anda harus menyetujui Syarat & Ketentuan"; termsErr.classList.add("show"); ok=false; }
+  else{ termsErr.classList.remove("show"); }
+  if(ok && email && isStrictEmail(email) && users.some(u=>u.email.toLowerCase()===email.toLowerCase())){
+    setError("rg-email", "Email ini sudah terdaftar, silakan masuk");
+    ok = false;
+  }
+  if(!ok) return;
+
+  const btn = document.getElementById("registerBtn");
+  btn.classList.add("loading"); btn.disabled = true;
+  setTimeout(()=>{
+    users.push({ name, email, status });
+    saveUsers(users);
+    btn.classList.remove("loading"); btn.disabled = false;
+    document.getElementById("registerForm").reset();
+    document.querySelectorAll("#strengthBar i").forEach(b=>b.className="");
+    document.getElementById("strengthLabel").textContent = "Minimal 8 karakter";
+    showView("login");
+    document.getElementById("li-email").value = email;
+    document.getElementById("loginBannerText").textContent = "Registrasi berhasil! Silakan masuk menggunakan akun Anda.";
+    document.getElementById("loginBanner").classList.remove("warn");
+    document.getElementById("loginBanner").classList.add("show");
+  }, 900);
+});
+
+</script>
+</body>
+</html>
